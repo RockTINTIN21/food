@@ -185,11 +185,20 @@ document.addEventListener('DOMContentLoaded', ()=> {
         console.log('Загружено')
     });
 
-    const postData
+    const postData = async (url,data) =>{ //async показывает что функция будет асинхронной
+        const res = await fetch(url,{ //await будет ждать пока операция выполнится прежде чем пойти дальше, не работает без async
+            method:"POST",
+            header:{
+                'Content-type':'application/json'
+            },
+            body: data
+        });
+        return await res.json();
+    }
 
     function bindPostData(form) {
         form.addEventListener('submit', (e) => {
-            e.preventDefault();  // Prevents page reload on form submission
+            e.preventDefault();
 
             // const request = new XMLHttpRequest();
             const statusMessage = document.createElement('div');
@@ -198,19 +207,17 @@ document.addEventListener('DOMContentLoaded', ()=> {
             form.append(statusMessage);
 
             const formData = new FormData(form);
+
             const object = {};
-            formData.forEach((value, key) => {
-                object[key] = value;
-            });
-            const json = JSON.stringify(object);
-            fetch('server.php',{
-                method:"POST",
-                header:{
-                    'Content-type':'application/json'
-                },
-                body: json
-            })
-                .then(data => data.text())
+            // formData.forEach((value, key) => {
+            //     object[key] = value;
+            // });Старый способ
+
+
+            //Новый способ
+            const json = JSON.stringify(Object.fromEntries(formData.entries()));//Сначала превращаем в массив массивов а потом в классический объект а потом в JSON формат
+
+                postData('http://localhost:3000/requests',JSON.stringify(object))
                 .then(data=> {//В случае успеха
                     console.log(formData)
                     console.log(data);

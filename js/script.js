@@ -166,10 +166,33 @@ document.addEventListener('DOMContentLoaded', ()=> {
             return div;
         }
     }
+    // const getResource = async (url) =>{ //async показывает что функция будет асинхронной
+    //     const res = await fetch(url);//await будет ждать пока операция выполнится прежде чем пойти дальше, не работает без async
+    //
+    //     if(!res.ok){
+    //         throw new Error(`Could not fetch ${url}, status: ${res.status}`);
+    //     }
+    //
+    //     return await res.json();
+    // }
 
-    const card1 = new Card('тест', 'описание', 1000);
-    const container = document.querySelector('#menu__cards');
-    container.appendChild(card1.createCard());
+
+    // getResource('http://localhost:3000/menu')
+    //     .then(data=>{
+    //         console.log(data)
+    //         data.forEach(({title,descr,price}) =>{
+    //             const container = document.querySelector('#menu__cards');
+    //             const card = container.appendChild(new Card(title,descr,price).createCard());
+    //         });
+    //     })
+
+    axios.get('http://localhost:3000/menu')
+        .then(data=> {
+            data.data.forEach(({title, descr, price}) => {
+                const container = document.querySelector('#menu__cards');
+                const card = container.appendChild(new Card(title, descr, price).createCard());
+            })
+        });
 
 
     //Forms
@@ -186,7 +209,7 @@ document.addEventListener('DOMContentLoaded', ()=> {
     });
 
     const postData = async (url,data) =>{ //async показывает что функция будет асинхронной
-        const res = await fetch(url,{ //await будет ждать пока операция выполнится прежде чем пойти дальше, не работает без async
+        const res = await fetch(url,{ //await будет ждать пока операция выполнится прежде чем пойти дальше, не работает без async. Тоесть без await код продолжит работать даже если в перменную еще ничего не пришло, тк запрос может идти долго
             method:"POST",
             header:{
                 'Content-type':'application/json'
@@ -199,8 +222,6 @@ document.addEventListener('DOMContentLoaded', ()=> {
     function bindPostData(form) {
         form.addEventListener('submit', (e) => {
             e.preventDefault();
-
-            // const request = new XMLHttpRequest();
             const statusMessage = document.createElement('div');
             statusMessage.style.textAlign = 'center';
             statusMessage.innerHTML = `<img src="../img/spinner.svg" width="50px" alt=""> <br> ${message.loading}`
@@ -209,15 +230,7 @@ document.addEventListener('DOMContentLoaded', ()=> {
             const formData = new FormData(form);
 
             const object = {};
-            // formData.forEach((value, key) => {
-            //     object[key] = value;
-            // });Старый способ
-
-
-            //Новый способ
-            const json = JSON.stringify(Object.fromEntries(formData.entries()));//Сначала превращаем в массив массивов а потом в классический объект а потом в JSON формат
-
-                postData('http://localhost:3000/requests',JSON.stringify(object))
+                postData('http://localhost:3000/requests', JSON.stringify(object))
                 .then(data=> {//В случае успеха
                     console.log(formData)
                     console.log(data);

@@ -166,34 +166,13 @@ document.addEventListener('DOMContentLoaded', ()=> {
             return div;
         }
     }
-    // const getResource = async (url) =>{ //async показывает что функция будет асинхронной
-    //     const res = await fetch(url);//await будет ждать пока операция выполнится прежде чем пойти дальше, не работает без async
-    //
-    //     if(!res.ok){
-    //         throw new Error(`Could not fetch ${url}, status: ${res.status}`);
-    //     }
-    //
-    //     return await res.json();
-    // }
-
-
-    // getResource('http://localhost:3000/menu')
-    //     .then(data=>{
-    //         console.log(data)
-    //         data.forEach(({title,descr,price}) =>{
-    //             const container = document.querySelector('#menu__cards');
-    //             const card = container.appendChild(new Card(title,descr,price).createCard());
-    //         });
-    //     })
-
     axios.get('http://localhost:3000/menu')
         .then(data=> {
             data.data.forEach(({title, descr, price}) => {
                 const container = document.querySelector('#menu__cards');
-                const card = container.appendChild(new Card(title, descr, price).createCard());
+                container.appendChild(new Card(title, descr, price).createCard());
             })
         });
-
 
     //Forms
     const forms = document.querySelectorAll('form');
@@ -248,7 +227,7 @@ document.addEventListener('DOMContentLoaded', ()=> {
 
         });
     }
-
+    //ThanksModal
     function showThanksModal() {
         document.querySelector('.modal__content > form').remove();
         const modalContent = document.querySelector('.modal__content');
@@ -256,31 +235,75 @@ document.addEventListener('DOMContentLoaded', ()=> {
         <div class="modal__title">Спасибо! Мы скоро свяжемся с вами</div>
         <div style="text-align: center;"><img src="../img/mark.svg" width="50px" alt=""></div>
         `;
-
-        console.log(modal)
     }
 
-    function getWeather(){
-        const APIkey = '8d5e2ff30a08fcf1bfff04ea7a6c2a27',
-            lat = 58.010422,
-            lon = 56.229443,
-            weather = document.querySelector('.weather');
-        fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${APIkey}`)
-            .then(response => response.json())
-            .then(data=>{
-                weather.innerHTML =
-                `
-                    <h1>Погода:</h1>
-                    <p>Город: ${data.name}</p>
-                    <p>Температура: ${((data.main.temp - 273.15)* 1.000000).toFixed(0)} градуса</p>
-                `
-                console.log(data);
-            })
-            .catch(error=>{
-                console.error('Произошла ошибка:', error)
-            })
+    //Slider
+    const slides = document.querySelectorAll('.offer__slide'),
+        prev = document.querySelector('.offer__slider-prev'),
+        next = document.querySelector('.offer__slider-next'),
+        total = document.querySelector('#total'),
+        current = document.querySelector('#current');
+    let slideIndex = 1;
+
+    showSlides(slideIndex);
+
+    if(slides.length < 10){
+        total.textContent = `0${slides.length}`;
+    }else{
+        total.textContent = slides.length;
     }
-    getWeather();
+    function showSlides(n){
+        if(n > slides.length){
+            slideIndex = 1;
+        }
+        if(n < 1){
+            slideIndex = slides.length;
+        }
+        slides.forEach(item=>item.style.display = 'none');
+        slides[slideIndex - 1].style.display = 'block';
+
+        if(slides.length < 10){
+            current.textContent = `0${slideIndex}`;
+        }else{
+            current.textContent = slideIndex;
+        }
+    }
+    function plusSlides(n){
+        showSlides(slideIndex += n);
+    }
+    prev.addEventListener('click',()=>{
+        plusSlides(-1);
+    });
+
+    next.addEventListener('click',()=>{
+        plusSlides(1);
+    });
+
+
+
+
+
+    // function getWeather(){
+    //     const APIkey = '8d5e2ff30a08fcf1bfff04ea7a6c2a27',
+    //         lat = 58.010422,
+    //         lon = 56.229443,
+    //         weather = document.querySelector('.weather');
+    //     fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${APIkey}`)
+    //         .then(response => response.json())
+    //         .then(data=>{
+    //             weather.innerHTML =
+    //             `
+    //                 <h1>Погода:</h1>
+    //                 <p>Город: ${data.name}</p>
+    //                 <p>Температура: ${((data.main.temp - 273.15)* 1.000000).toFixed(0)} градуса</p>
+    //             `
+    //             console.log(data);
+    //         })
+    //         .catch(error=>{
+    //             console.error('Произошла ошибка:', error)
+    //         })
+    // }
+    // getWeather();
 
     fetch('http://localhost:3000/menu')
         .then(data=>data.json())
